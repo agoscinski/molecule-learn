@@ -1,4 +1,6 @@
 *.swp
+*.swo
+src/__pycache__
 plots/*
 results/*
 datasets/*

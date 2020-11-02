@@ -26,15 +26,13 @@ class SymmetrizedAtomicDensityCorrelation:
         }
 
     def compute(self, frames, center_atom_id_mask=None):
-        if center_atom_id_mask is None:
-            center_atom_id_mask = [list(range(len(frame))) for frame in frames]
         for i in range(len(frames)):
             mask_center_atoms_by_id(frames[i], id_select=center_atom_id_mask[i])
 
         if self.target == 'Atom':
             return self.representation.transform(frames).get_features(self.representation)
         elif self.target == 'Structure':
-            # computes mean feature
+            # computes sum feature
             atom_features = self.representation.transform(frames).get_features(self.representation)
             atom_to_struc_idx = np.hstack( (0, np.cumsum([len(frame) for frame in frames])) )
-            return np.vstack( [np.mean(atom_features[atom_to_struc_idx[i]:atom_to_struc_idx[i+1]], axis=0) for i in range(len(frames))]  )
+            return np.vstack( [np.sum(atom_features[atom_to_struc_idx[i]:atom_to_struc_idx[i+1]], axis=0) for i in range(len(frames))]  )

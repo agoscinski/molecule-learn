@@ -14,7 +14,7 @@ from src.utils import class_name
 DATASET_FOLDER = "datasets/"
 RESULTS_FOLDER = "results/"
 
-
+HARTREE_TO_EV = 0.0367502
 
 def get_model_metadata(kernel):
     params = kernel.get_params(deep=False)
@@ -37,6 +37,10 @@ def read_dataset(dataset_name, nb_structures, property_name):
     import ase.io
     frames = ase.io.read(DATASET_FOLDER+dataset_name, ':'+str(nb_structures))
     property_values = np.array([frame.info[property_name] for frame in frames])
+    if dataset_name == 'qm9.extxyz':
+        # convert Hartree to eV/atom
+        property_values *= HARTREE_TO_EV
+        property_values /= np.array([len(frame) for frame in frames])
     return frames, property_values
 
 def compute_experiment(model, representation, dataset_name, nb_structures, property_name, seed):
@@ -44,14 +48,15 @@ def compute_experiment(model, representation, dataset_name, nb_structures, prope
     print(f"Conduction experiment with hash value {experiment_hash} ...", flush=True)
     print("Read dataset...", flush=True)
     frames, property_values = read_dataset(dataset_name, nb_structures, property_name)
+    # select all environments
+    center_atom_id_mask = [list(range(len(frame))) for frame in frames]
     print("Read dataset finished", flush=True)
     print("Compute features...", flush=True)
-    features = representation.compute(frames)
+    features = representation.compute(frames, center_atom_id_mask)
     print("Compute features finished", flush=True)
 
     print("Compute cross validation...", flush=True)
-    #scoring 
-    #make_scorer(scoring)
+    score_weights = np.array([1/len(mask) for mask in center_atom_id_mask])
 
     results = cross_validate(model, features, property_values, cv=nb_folds, scoring=('neg_mean_absolute_error', 'neg_root_mean_squared_error', 'r2'), return_train_score=True)
     # TODO https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.learning_curve.html#sklearn.model_selection.learning_curve
@@ -63,6 +68,7 @@ def compute_experiment(model, representation, dataset_name, nb_structures, prope
 
     # make arrays to lists
     print("Store results...", flush=True)
+    print(results)
     for key in results.keys():
         if (type(results[key]) == type(np.array(0))):
             results[key] = results[key].tolist()

@@ -52,7 +52,7 @@ def read_dataset(dataset_name, nb_structures, property_name):
         property_values /= np.array([len(frame) for frame in frames])
     return frames, property_values
 
-def compute_experiment(kerne_ridge, representation, dataset_name, nb_structures, property_name, train_sizes_perc, test_size_perc seed):
+def compute_experiment(model, representation, dataset_name, nb_structures, property_name, train_sizes_perc, test_size_perc, seed):
     experiment_hash = store_metadata(model, representation, dataset_name, nb_structures, property_name)
     print(f"Conduction experiment with hash value {experiment_hash} ...", flush=True)
     print("Read dataset...", flush=True)
@@ -107,7 +107,8 @@ def compute_experiment(kerne_ridge, representation, dataset_name, nb_structures,
 dataset_name = "qm9_cosmo_paper.extxyz"
 nb_structures = 35000
 property_name = "eV/atom"
-train_sizes_perc = [0.015, 0.035, 0.075, 0.15]
+#train_sizes_perc = [0.015, 0.035, 0.075, 0.15]
+train_sizes_perc = [0.015]
 test_size_perc = 0.85
 #dataset_name = "qm9.extxyz"
 #nb_structures = 130000
@@ -147,4 +148,4 @@ representation = SymmetrizedAtomicDensityCorrelation(representation_hypers, "Str
 
 ##
 
-compute_experiment(kerne_ridge, representation, dataset_name, nb_structures, property_name, train_sizes_perc, test_size_perc seed)
+compute_experiment(kerne_ridge, representation, dataset_name, nb_structures, property_name, train_sizes_perc, test_size_perc, seed)

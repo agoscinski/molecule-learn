@@ -9,6 +9,7 @@ from sklearn.metrics import make_scorer
 from sklearn.kernel_ridge import KernelRidge
 
 from src.representation import SymmetrizedAtomicDensityCorrelation
+from src.model import KernelRidgeRegresion
 from src.utils import class_name
 
 DATASET_FOLDER = "datasets/"
@@ -18,7 +19,7 @@ HARTREE_TO_EV = 27.2107
 EV_TO_HARTREE = 1/HARTREE_TO_EV
 
 def get_model_metadata(kernel):
-    params = kernel.get_params(deep=False)
+    params = kernel.get_params()
     k_class = kernel.__class__
     params['class'] = f'{k_class.__module__}.{k_class.__name__}'
     return params
@@ -57,8 +58,6 @@ def compute_experiment(model, representation, dataset_name, nb_structures, prope
     print("Compute features finished", flush=True)
 
     print("Compute cross validation...", flush=True)
-    score_weights = np.array([1/len(mask) for mask in center_atom_id_mask])
-
     results = cross_validate(model, features, property_values, cv=nb_folds, scoring=('neg_mean_absolute_error', 'neg_root_mean_squared_error', 'r2'), return_train_score=True)
     # TODO https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.learning_curve.html#sklearn.model_selection.learning_curve
     #if seed is None: 
@@ -91,7 +90,11 @@ seed = 0x5f3759df
 
 # model
 # TODO replace with Normalizer kernel
-kerne_ridge = KernelRidge(alpha=1e-9)
+sigma = 0.0001
+#kernel_function = lambda x: x**2
+#variance hardcoded for the moment
+kerne_ridge = KernelRidge(kernel='polynomial', degree=2, alpha=sigma**2/30706398.166229796)
+#kerne_ridge = KernelRidgeRegresion(kernel_function, sigma)
 
 # feature
 representation_hypers = {
@@ -104,7 +107,7 @@ representation_hypers = {
         "gaussian_sigma_type": "Constant",
         "cutoff_function_type": "RadialScaling",
         "cutoff_smooth_width": 0.5,
-        "cutoff_function_parameters": 
+        "cutoff_function_parameters":
             dict(rate=1,
                  scale=2,
                  exponent=7),

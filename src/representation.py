@@ -1,7 +1,5 @@
 # coding: utf-8
 import numpy as np
-import copy
-import warnings
 
 from rascal.representations import SphericalInvariants
 from rascal.neighbourlist.structure_manager import mask_center_atoms_by_id
@@ -34,5 +32,5 @@ class SymmetrizedAtomicDensityCorrelation:
         elif self.target == 'Structure':
             # computes sum feature
             atom_features = self.representation.transform(frames).get_features(self.representation)
-            atom_to_struc_idx = np.hstack( (0, np.cumsum([len(frame) for frame in frames])) )
-            return np.vstack( [np.sum(atom_features[atom_to_struc_idx[i]:atom_to_struc_idx[i+1]], axis=0) for i in range(len(frames))]  )
+            atom_to_struc_idx = np.hstack( (0, np.cumsum([len(center_mask) for center_mask in center_atom_id_mask])) )
+            return np.vstack( [np.sum(atom_features[atom_to_struc_idx[i]:atom_to_struc_idx[i+1]], axis=0) for i in range(len(frames))] )

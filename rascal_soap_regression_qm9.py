@@ -52,7 +52,7 @@ def read_dataset(dataset_name, nb_structures, property_name):
         property_values /= np.array([len(frame) for frame in frames])
     return frames, property_values
 
-def compute_experiment(model, representation, dataset_name, nb_structures, property_name, seed):
+def compute_experiment(kerne_ridge, representation, dataset_name, nb_structures, property_name, train_sizes_perc, test_size_perc seed):
     experiment_hash = store_metadata(model, representation, dataset_name, nb_structures, property_name)
     print(f"Conduction experiment with hash value {experiment_hash} ...", flush=True)
     print("Read dataset...", flush=True)
@@ -65,9 +65,9 @@ def compute_experiment(model, representation, dataset_name, nb_structures, prope
     print("Compute features finished", flush=True)
 
     print("Compute cross validation...", flush=True)
-    cv = ShuffleSplit(n_splits=nb_folds, test_size=0.25, random_state=seed)
+    cv = ShuffleSplit(n_splits=nb_folds, test_size=test_size_perc, random_state=seed)
     train_sizes, train_scores, test_scores, fit_times, score_times = learning_curve(model, features, property_values, cv=cv, scoring='neg_mean_absolute_error',
-                   train_sizes=[0.01,0.05,0.1,0.5,0.75], return_times=True, verbose=1)
+                   train_sizes=train_sizes_perc, return_times=True, verbose=1)
     train_scores_mean = np.mean(train_scores, axis=1)
     train_scores_std = np.std(train_scores, axis=1)
     test_scores_mean = np.mean(test_scores, axis=1)
@@ -77,6 +77,8 @@ def compute_experiment(model, representation, dataset_name, nb_structures, prope
     score_times_mean = np.mean(fit_times, axis=1)
     score_times_std = np.std(fit_times, axis=1)
     results = {
+            'train_sizes_perc': train_sizes_perc,
+            'test_size_perc': test_size_perc,
             'train_scores_mean': train_scores_mean.tolist(),
             'train_scores_std': train_scores_std.tolist(),
             'test_scores_mean': test_scores_mean.tolist(),
@@ -102,9 +104,16 @@ def compute_experiment(model, representation, dataset_name, nb_structures, prope
 
 ## Hypers
 
-dataset_name = "qm9.extxyz"
-nb_structures = 1000
-property_name = "energy_U0"
+dataset_name = "qm9_cosmo_paper.extxyz"
+nb_structures = 35000
+property_name = "eV/atom"
+train_sizes_perc = [0.015, 0.035, 0.075, 0.15]
+test_size_perc = 0.85
+#dataset_name = "qm9.extxyz"
+#nb_structures = 130000
+#property_name = "energy_U0"
+#train_sizes_perc = [0.01,0.05,0.1,0.5,0.75]
+#test_size_perc = 0.25
 
 # cross validation
 nb_folds = 2
@@ -138,4 +147,4 @@ representation = SymmetrizedAtomicDensityCorrelation(representation_hypers, "Str
 
 ##
 
-compute_experiment(kerne_ridge, representation, dataset_name, nb_structures, property_name, seed)
+compute_experiment(kerne_ridge, representation, dataset_name, nb_structures, property_name, train_sizes_perc, test_size_perc seed)

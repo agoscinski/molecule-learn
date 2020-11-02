@@ -48,8 +48,7 @@ def read_dataset(dataset_name, nb_structures, property_name):
     frames = ase.io.read(DATASET_FOLDER+dataset_name, ':'+str(nb_structures))
     property_values = np.array([frame.info[property_name] for frame in frames])
     if dataset_name == 'qm9.extxyz':
-        # convert Hartree to eV/atom
-        property_values *= HARTREE_TO_EV
+        # convert to eV/atom
         property_values /= np.array([len(frame) for frame in frames])
     return frames, property_values
 

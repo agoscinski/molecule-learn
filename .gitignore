@@ -1,0 +1,4 @@
+*.swp
+plots/*
+results/*
+datasets/*

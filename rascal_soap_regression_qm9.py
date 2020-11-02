@@ -81,7 +81,7 @@ def compute_experiment(model, representation, dataset_name, nb_structures, prope
 ## Hypers
 
 dataset_name = "qm9.extxyz"
-nb_structures = 10000
+nb_structures = 1000
 property_name = "energy_U0"
 
 # cross validation
@@ -91,10 +91,9 @@ seed = 0x5f3759df
 # model
 # TODO replace with Normalizer kernel
 sigma = 0.0001
-#kernel_function = lambda x: x**2
 #variance hardcoded for the moment
-kerne_ridge = KernelRidge(kernel='polynomial', degree=2, alpha=sigma**2/30706398.166229796)
-#kerne_ridge = KernelRidgeRegresion(kernel_function, sigma)
+#kerne_ridge = KernelRidge(kernel='polynomial', degree=2, alpha=sigma**2/30706398.166229796)
+kerne_ridge = KernelRidgeRegresion('GAP', sigma)
 
 # feature
 representation_hypers = {

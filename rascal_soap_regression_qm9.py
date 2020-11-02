@@ -4,7 +4,7 @@ import json
 import os
 import random
 
-from sklearn.model_selection import cross_validate, learning_curve
+from sklearn.model_selection import cross_validate, learning_curve, ShuffleSplit
 from sklearn.metrics import make_scorer
 from sklearn.kernel_ridge import KernelRidge
 
@@ -65,12 +65,27 @@ def compute_experiment(model, representation, dataset_name, nb_structures, prope
     print("Compute features finished", flush=True)
 
     print("Compute cross validation...", flush=True)
-    results = cross_validate(model, features, property_values, cv=nb_folds, scoring=('neg_mean_absolute_error', 'neg_root_mean_squared_error', 'r2'), return_train_score=True)
-    # TODO https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.learning_curve.html#sklearn.model_selection.learning_curve
-    #if seed is None: 
-    #    cv_results = learning_curve(model, features, property_values, cv=nb_folds, scoring=('mean_absolute_error', 'neg_root_mean_squared_error', 'r2'), return_times=True, return_train_score=True)
-    #else:
-    #    cv_results = learning_curve(model, features, property_values, cv=nb_folds, scoring=('mean_absolute_error', 'neg_root_mean_squared_error', 'r2'), return_times=True, return_train_score=True, shuffle=True, random_state=seed)
+    cv = ShuffleSplit(n_splits=nb_folds, test_size=0.25, random_state=seed)
+    train_sizes, train_scores, test_scores, fit_times, score_times = learning_curve(model, features, property_values, cv=cv, scoring='neg_mean_absolute_error',
+                   train_sizes=[0.01,0.05,0.1,0.5,0.75], return_times=True, verbose=1)
+    train_scores_mean = np.mean(train_scores, axis=1)
+    train_scores_std = np.std(train_scores, axis=1)
+    test_scores_mean = np.mean(test_scores, axis=1)
+    test_scores_std = np.std(test_scores, axis=1)
+    fit_times_mean = np.mean(fit_times, axis=1)
+    fit_times_std = np.std(fit_times, axis=1)
+    score_times_mean = np.mean(fit_times, axis=1)
+    score_times_std = np.std(fit_times, axis=1)
+    results = {
+            'train_scores_mean': train_scores_mean.tolist(),
+            'train_scores_std': train_scores_std.tolist(),
+            'test_scores_mean': test_scores_mean.tolist(),
+            'test_scores_std': test_scores_std.tolist(),
+            'fit_times_mean': fit_times_mean.tolist(),
+            'fit_times_std': fit_times_std.tolist(),
+            'score_times_mean': score_times_mean.tolist(),
+            'score_times_std': score_times_std.tolist() }
+    #results = cross_validate(model, features, property_values, cv=nb_folds, scoring=('neg_mean_absolute_error', 'neg_root_mean_squared_error', 'r2'), return_train_score=True)
     print("Compute cross validation finished", flush=True)
 
     # make arrays to lists
@@ -88,7 +103,7 @@ def compute_experiment(model, representation, dataset_name, nb_structures, prope
 ## Hypers
 
 dataset_name = "qm9.extxyz"
-nb_structures = 20000
+nb_structures = 1000
 property_name = "energy_U0"
 
 # cross validation

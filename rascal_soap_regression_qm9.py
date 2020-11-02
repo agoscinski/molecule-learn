@@ -12,6 +12,14 @@ from src.representation import SymmetrizedAtomicDensityCorrelation
 from src.model import KernelRidgeRegresion
 from src.utils import class_name
 
+import resource
+def memory_limit(nb_bytes):
+    soft, hard = resource.getrlimit(resource.RLIMIT_AS)
+    resource.setrlimit(resource.RLIMIT_AS, (nb_bytes, hard))
+# limits memory usage to 800 GB
+memory_limit(int(8e+11))
+
+
 DATASET_FOLDER = "datasets/"
 RESULTS_FOLDER = "results/"
 
@@ -81,7 +89,7 @@ def compute_experiment(model, representation, dataset_name, nb_structures, prope
 ## Hypers
 
 dataset_name = "qm9.extxyz"
-nb_structures = 1000
+nb_structures = 20000
 property_name = "energy_U0"
 
 # cross validation

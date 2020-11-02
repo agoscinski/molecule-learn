@@ -14,7 +14,8 @@ from src.utils import class_name
 DATASET_FOLDER = "datasets/"
 RESULTS_FOLDER = "results/"
 
-HARTREE_TO_EV = 0.0367502
+HARTREE_TO_EV = 27.2107
+EV_TO_HARTREE = 1/HARTREE_TO_EV
 
 def get_model_metadata(kernel):
     params = kernel.get_params(deep=False)

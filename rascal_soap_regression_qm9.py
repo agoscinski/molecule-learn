@@ -104,17 +104,17 @@ def compute_experiment(model, representation, dataset_name, nb_structures, prope
 
 ## Hypers
 
-dataset_name = "qm9_cosmo_paper.extxyz"
-nb_structures = 35000
-property_name = "eV/atom"
+#dataset_name = "qm9_cosmo_paper.extxyz"
+#nb_structures = 35000
+#property_name = "eV/atom"
 #train_sizes_perc = [0.015, 0.035, 0.075, 0.15]
-train_sizes_perc = [0.015]
-test_size_perc = 0.85
-#dataset_name = "qm9.extxyz"
-#nb_structures = 130000
-#property_name = "energy_U0"
-#train_sizes_perc = [0.01,0.05,0.1,0.5,0.75]
-#test_size_perc = 0.25
+#test_size_perc = 0.85
+
+dataset_name = "qm9.extxyz"
+nb_structures = 130000
+property_name = "energy_U0"
+train_sizes_perc = [0.01,0.05,0.1,0.5,0.75]
+test_size_perc = 0.25
 
 # cross validation
 nb_folds = 2
@@ -123,8 +123,6 @@ seed = 0x5f3759df
 # model
 # TODO replace with Normalizer kernel
 sigma = 0.0001
-#variance hardcoded for the moment
-#kerne_ridge = KernelRidge(kernel='polynomial', degree=2, alpha=sigma**2/30706398.166229796)
 kerne_ridge = KernelRidgeRegresion('GAP', sigma)
 
 # feature

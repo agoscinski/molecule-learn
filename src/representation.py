@@ -30,7 +30,7 @@ class SymmetrizedAtomicDensityCorrelation:
             # computes sum feature
             atom_features = self.representation.transform(frames).get_features(self.representation)
             atom_to_struc_idx = np.hstack( (0, np.cumsum([len(center_mask) for center_mask in center_atom_id_mask])) )
-            return np.vstack( [np.sum(atom_features[atom_to_struc_idx[i]:atom_to_struc_idx[i+1]], axis=0) for i in range(len(frames))] )
+            return np.vstack( [np.mean(atom_features[atom_to_struc_idx[i]:atom_to_struc_idx[i+1]], axis=0) for i in range(len(frames))] )
 
 class NumberOfSpecies:
     def __init__(self, species, target):
@@ -51,4 +51,5 @@ class NumberOfSpecies:
             for i in range(len(frames)):
                 numbers_i = frames[i].numbers[np.array(center_atom_id_mask[i])]
                 features[i] = [np.sum(np.where(specie == numbers_i)[0]) for specie in self.species]
+                features[i] /= len(frames[i])
             return features

@@ -8,7 +8,7 @@ from sklearn.model_selection import cross_validate, learning_curve, ShuffleSplit
 from sklearn.metrics import make_scorer
 from sklearn.kernel_ridge import KernelRidge
 
-from src.representation import SymmetrizedAtomicDensityCorrelation
+from src.representation import SymmetrizedAtomicDensityCorrelation, NumberOfSpecies
 from src.model import KernelRidgeRegresion
 from src.utils import class_name
 
@@ -128,23 +128,26 @@ sigma = 0.0001
 kerne_ridge = KernelRidgeRegresion('GAP', sigma)
 
 # feature
-representation_hypers = {
-        "soap_type": "PowerSpectrum",
-        "radial_basis": "GTO",
-        "interaction_cutoff": 5,
-        "max_radial": 12,
-        "max_angular": 9,
-        "gaussian_sigma_constant": 0.3,
-        "gaussian_sigma_type": "Constant",
-        "cutoff_function_type": "RadialScaling",
-        "cutoff_smooth_width": 0.5,
-        "cutoff_function_parameters":
-            dict(rate=1,
-                 scale=2,
-                 exponent=7),
-        "normalize": True
-    }
-representation = SymmetrizedAtomicDensityCorrelation(representation_hypers, "Structure")
+#representation_hypers = {
+#        "soap_type": "PowerSpectrum",
+#        "radial_basis": "GTO",
+#        "interaction_cutoff": 5,
+#        "max_radial": 12,
+#        "max_angular": 9,
+#        "gaussian_sigma_constant": 0.3,
+#        "gaussian_sigma_type": "Constant",
+#        "cutoff_function_type": "RadialScaling",
+#        "cutoff_smooth_width": 0.5,
+#        "cutoff_function_parameters":
+#            dict(rate=1,
+#                 scale=2,
+#                 exponent=7),
+#        "normalize": True
+#    }
+#representation = SymmetrizedAtomicDensityCorrelation(representation_hypers, "Structure")
+
+species = [1,6,7,8,9]
+representation = NumberOfSpecies(species, "Structure")
 
 ##
 

@@ -6,7 +6,5 @@ property_values = np.hstack( (np.load('qm9_eV_30000.dHf_peratom.npy'), np.load('
 
 for i in range(len(frames)):
     frames[i].info['eV/atom'] = property_values[i]
-    #frames[i].cell = np.eye(3) * 100
-    #frames[i].center()
-    #frames[i].wrap(eps=1e-11)
+    frames[i].center()
 ase.io.write("qm9_cosmo_paper.extxyz", frames)
